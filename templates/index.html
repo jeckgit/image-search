@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Hello, World!</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    li {
+      flex: 0 0 auto;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>This will get an awesome Image search!</h1>
+  <h2>Here you can see the images the model has been trained on:</h2>
+
+  <ul>
+    {% for image in image_files %}
+    <li>
+      <img src="{{ url_for('serve_image', filename=image) }}" alt="{{ image }}" width="75" height="75">
+    </li>
+    {% endfor %}
+  </ul>
+  <h2>Search is implemented Via Hierarchical Navigable Small Worlds (HNSW)</h2>
+
+  <form id="upload-form">
+    <input type="file" id="image-input">
+    <input type="button" value="Upload" onclick="uploadImage()">
+  </form>
+  <p id="message"></p>
+
+  <div id="image-container"></div>
+
+  <script>
+    function uploadImage() {
+      const fileInput = document.getElementById('image-input');
+      const file = fileInput.files[0];
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      axios.post('/upload', formData)
+        .then(function (response) {
+          const encodedImage = response.data.message;
+          const imageContainer = document.getElementById('image-container');
+          const image = document.createElement('img');
+          image.src = 'data:image/png;base64,' + encodedImage;
+          imageContainer.appendChild(image);
+        })
+        .catch(function (error) {
+          document.getElementById('message').innerText = 'Error uploading image.';
+        });
+    }
+  </script>
+
+</body>
+
+</html>
